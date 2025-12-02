@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiX } from "react-icons/hi";
 
@@ -43,6 +43,17 @@ const artworks = [
 
 export default function ArtGallery() {
   const [selectedArt, setSelectedArt] = useState(null);
+
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === "Escape" && selectedArt) {
+      setSelectedArt(null);
+    }
+  }, [selectedArt]);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
   return (
     <section id="myart" className="py-16 lg:py-24 px-5 lg:px-28 bg-gray-50">
