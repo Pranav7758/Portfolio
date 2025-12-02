@@ -43,14 +43,31 @@ async function getGitHubClient() {
   return new Octokit({ auth: accessToken });
 }
 
+const IGNORE_PATTERNS = [
+  'node_modules',
+  '.git',
+  '.cache',
+  '.config',
+  '.local',
+  '.replit',
+  'replit.md',
+  'push-to-github.mjs',
+  'package-lock.json',
+  '.upm'
+];
+
+function shouldIgnore(filePath) {
+  return IGNORE_PATTERNS.some(pattern => filePath.includes(pattern));
+}
+
 function getAllFiles(dirPath, arrayOfFiles = [], basePath = '') {
   const files = fs.readdirSync(dirPath);
 
   files.forEach((file) => {
     const fullPath = path.join(dirPath, file);
-    const relativePath = path.join(basePath, file);
+    const relativePath = basePath ? path.join(basePath, file) : file;
     
-    if (file === 'node_modules' || file === '.git' || file === '.cache') {
+    if (shouldIgnore(relativePath)) {
       return;
     }
 
@@ -76,104 +93,68 @@ async function main() {
   const { data: user } = await octokit.users.getAuthenticated();
   console.log(`Logged in as: ${user.login}`);
   
-  console.log(`Creating repository: ${repoName}...`);
-  let repo;
   try {
-    const { data } = await octokit.repos.createForAuthenticatedUser({
-      name: repoName,
-      description: 'Personal Portfolio - Full Stack Developer | Built with React, Vite, and Tailwind CSS',
-      private: false,
-      auto_init: false
+    console.log(`Deleting existing empty repository: ${repoName}...`);
+    await octokit.repos.delete({
+      owner: user.login,
+      repo: repoName
     });
-    repo = data;
-    console.log(`Repository created: ${repo.html_url}`);
+    console.log('Deleted successfully.');
+    await new Promise(resolve => setTimeout(resolve, 2000));
   } catch (error) {
-    if (error.status === 422) {
-      console.log('Repository already exists, fetching it...');
-      const { data } = await octokit.repos.get({
-        owner: user.login,
-        repo: repoName
-      });
-      repo = data;
-      console.log(`Using existing repository: ${repo.html_url}`);
-    } else {
-      throw error;
+    if (error.status !== 404) {
+      console.log('Repository does not exist or cannot be deleted.');
     }
   }
 
-  console.log('Collecting files from portfolio...');
-  const projectPath = './illustration-portfolio-mainzipzip-1';
-  const files = getAllFiles(projectPath);
-  console.log(`Found ${files.length} files to upload`);
+  console.log(`Creating fresh repository: ${repoName}...`);
+  const { data: repo } = await octokit.repos.createForAuthenticatedUser({
+    name: repoName,
+    description: 'Personal Portfolio - Full Stack Developer | Built with React, Vite, and Tailwind CSS',
+    private: false,
+    auto_init: true
+  });
+  console.log(`Repository created: ${repo.html_url}`);
+  
+  console.log('Waiting for repository to initialize...');
+  await new Promise(resolve => setTimeout(resolve, 3000));
 
-  const blobs = [];
+  console.log('\nCollecting files...');
+  const files = getAllFiles('.');
+  console.log(`Found ${files.length} files to upload\n`);
+
+  console.log('Uploading files to GitHub...');
+  let uploaded = 0;
+  let failed = 0;
+  
   for (const file of files) {
     const content = fs.readFileSync(file.fullPath);
-    const encoding = isTextFile(file.path) ? 'utf-8' : 'base64';
-    const fileContent = encoding === 'base64' ? content.toString('base64') : content.toString('utf-8');
+    const base64Content = content.toString('base64');
     
     try {
-      const { data: blob } = await octokit.git.createBlob({
+      await octokit.repos.createOrUpdateFileContents({
         owner: user.login,
         repo: repoName,
-        content: fileContent,
-        encoding: encoding
-      });
-      
-      blobs.push({
         path: file.path,
-        mode: '100644',
-        type: 'blob',
-        sha: blob.sha
+        message: `Add ${file.path}`,
+        content: base64Content
       });
-      process.stdout.write('.');
+      uploaded++;
+      process.stdout.write(`\rUploaded: ${uploaded}/${files.length}`);
     } catch (err) {
-      console.error(`\nFailed to upload: ${file.path}`);
+      failed++;
+      console.error(`\nFailed to upload: ${file.path} - ${err.message}`);
     }
   }
-  console.log('\nFiles uploaded!');
-
-  console.log('Creating commit...');
-  const { data: tree } = await octokit.git.createTree({
-    owner: user.login,
-    repo: repoName,
-    tree: blobs
-  });
-
-  const { data: commit } = await octokit.git.createCommit({
-    owner: user.login,
-    repo: repoName,
-    message: 'Initial commit - Pranav Borse Portfolio',
-    tree: tree.sha
-  });
-
-  try {
-    await octokit.git.createRef({
-      owner: user.login,
-      repo: repoName,
-      ref: 'refs/heads/main',
-      sha: commit.sha
-    });
-  } catch (e) {
-    await octokit.git.updateRef({
-      owner: user.login,
-      repo: repoName,
-      ref: 'heads/main',
-      sha: commit.sha,
-      force: true
-    });
-  }
-
-  console.log('\n========================================');
+  
+  console.log(`\n\nUpload complete! ${uploaded} files uploaded, ${failed} failed.`);
+  console.log('\n==========================================');
   console.log('SUCCESS! Your portfolio is now on GitHub!');
-  console.log(`Repository URL: ${repo.html_url}`);
-  console.log('========================================');
+  console.log(`Repository: ${repo.html_url}`);
+  console.log('==========================================');
 }
 
-function isTextFile(filePath) {
-  const textExtensions = ['.js', '.jsx', '.ts', '.tsx', '.json', '.html', '.css', '.md', '.txt', '.svg', '.xml', '.yml', '.yaml', '.mjs', '.cjs'];
-  const ext = path.extname(filePath).toLowerCase();
-  return textExtensions.includes(ext);
-}
-
-main().catch(console.error);
+main().catch(err => {
+  console.error('Error:', err.message);
+  process.exit(1);
+});

@@ -1,0 +1,31 @@
+import React from 'react'
+import Home from './pages/Home'
+import Skills from './components/Skills'
+import Navbar from './components/Navbar'
+import About from './components/About'
+import Footer from './components/Footer'
+import Projects from './components/Projects'
+import Education from './components/Education'
+import Certificates from './components/Certificates'
+import Contact from './components/Contact'
+import CustomCursor from './utils/CursorAnimation'
+import ArtGallery from './components/ArtGallery'
+
+export default function App() {
+  return (
+    <div className='font-sora scroll-smooth overflow-x-hidden'>
+      <CustomCursor/>
+      <Navbar />
+      <Home />
+      <Projects />
+      <Skills />
+      <About />
+      <ArtGallery />
+      <Certificates />
+      <Education />
+      <Contact />
+
+      <Footer />
+    </div>
+  )
+}
