@@ -12,6 +12,7 @@ export default function Education() {
       location: "Kopargaon, India",
       duration: "Aug 2024 – Ongoing",
       status: "current",
+      marks: "CGPA: 8.12",
     },
     {
       id: 2,
@@ -20,6 +21,7 @@ export default function Education() {
       location: "Malegaon, India",
       duration: "July 2021 – July 2024",
       status: "completed",
+      marks: "87%",
     },
   ];
 
@@ -91,6 +93,11 @@ export default function Education() {
                     <span>{edu.duration}</span>
                   </div>
                 </div>
+                {edu.marks && (
+                  <div className="mt-3">
+                    <span className="text-green-600 font-bold text-base">{edu.marks}</span>
+                  </div>
+                )}
               </motion.div>
             </motion.div>
           ))}

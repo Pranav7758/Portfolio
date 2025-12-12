@@ -6,6 +6,17 @@ import { motion } from 'framer-motion';
 const projects = [
   {
     id: 1,
+    title: "SenseiLearn",
+    subtitle: "Japanese Language Learning Platform",
+    description: "An immersive, beautifully crafted Japanese language learning platform that transforms your journey into an epic adventure. Features Hiragana, Katakana, Kanji lessons, grammar practice, and AI-powered coaching with Gemini AI.",
+    technologies: ["TypeScript", "React", "Tailwind CSS", "Supabase", "Gemini AI"],
+    image: "/assets/projects/senseilearn.png",
+    status: "Live",
+    liveUrl: "https://sensei-learn.vercel.app",
+    githubUrl: "https://github.com/Pranav7758/SenseiLearn"
+  },
+  {
+    id: 2,
     title: "BUSSPASS",
     subtitle: "Bus Pass Management System",
     description: "A modern bus pass management application that streamlines the process of issuing, managing, and validating bus passes. Built with TypeScript and deployed on Vercel for seamless user experience.",
@@ -16,7 +27,7 @@ const projects = [
     githubUrl: "https://github.com/Pranav7758/BUSSPASS"
   },
   {
-    id: 2,
+    id: 3,
     title: "Anime Watchlist Logbook",
     subtitle: "Anime Tracking Web Application",
     description: "A modern web application for tracking your anime watchlist. Keep track of what you're watching, plan to watch, and have completed. Features a clean UI for managing your anime collection.",
@@ -27,7 +38,7 @@ const projects = [
     githubUrl: "https://github.com/Pranav7758/anime-watchlist-logbook"
   },
   {
-    id: 3,
+    id: 4,
     title: "Digital Setu Hub",
     subtitle: "Digital Connectivity Platform",
     description: "A digital connectivity hub designed to bridge gaps and connect users with essential services. Built with modern web technologies for a smooth and responsive user experience.",
