@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { BiLogoGmail } from 'react-icons/bi';
 import { BsGithub } from 'react-icons/bs';
@@ -9,6 +9,24 @@ import { FaPhone } from "react-icons/fa6";
 export default function Contact() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    website: '',
+    message: ''
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const subject = encodeURIComponent(`Portfolio Contact from ${formData.name}`);
+    const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nWebsite: ${formData.website || 'Not provided'}\n\nMessage:\n${formData.message}`);
+    const mailtoLink = `mailto:borsepranav700@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = mailtoLink;
+  };
 
   const socialLinks = [
     { Icon: BiLogoGmail, href: "mailto:borsepranav700@gmail.com" },
@@ -41,11 +59,11 @@ export default function Contact() {
           transition={{ duration: 0.8 }}
           className='lg:w-[40%]'
         >
-          <form className='w-full space-y-3 lg:space-y-5'>
-            <input className='border-2 px-5 py-3 border-black rounded placeholder:text-[#71717A] text-sm w-full' type="text" placeholder='Your name' required />
-            <input className='border-2 px-5 py-3 border-black rounded placeholder:text-[#71717A] text-sm w-full' type="email" placeholder='Email' required />
-            <input className='border-2 px-5 py-3 border-black rounded placeholder:text-[#71717A] text-sm w-full' type="text" placeholder='Your website (If exists)' />
-            <textarea className='resize-none border-2 px-5 py-3 h-32 border-black placeholder:text-[#71717A]  rounded text-sm w-full' placeholder='How can I help?*'></textarea>
+          <form className='w-full space-y-3 lg:space-y-5' onSubmit={handleSubmit}>
+            <input className='border-2 px-5 py-3 border-black rounded placeholder:text-[#71717A] text-sm w-full' type="text" name="name" value={formData.name} onChange={handleChange} placeholder='Your name' required />
+            <input className='border-2 px-5 py-3 border-black rounded placeholder:text-[#71717A] text-sm w-full' type="email" name="email" value={formData.email} onChange={handleChange} placeholder='Email' required />
+            <input className='border-2 px-5 py-3 border-black rounded placeholder:text-[#71717A] text-sm w-full' type="text" name="website" value={formData.website} onChange={handleChange} placeholder='Your website (If exists)' />
+            <textarea className='resize-none border-2 px-5 py-3 h-32 border-black placeholder:text-[#71717A] rounded text-sm w-full' name="message" value={formData.message} onChange={handleChange} placeholder='How can I help?*' required></textarea>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}

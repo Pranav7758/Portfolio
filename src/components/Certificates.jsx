@@ -10,6 +10,16 @@ export default function Certificates() {
   const certificates = [
     {
       id: 1,
+      title: "Generative AI Literacy",
+      issuer: "IT-ITeS SSC Nasscom",
+      date: "Dec 2025",
+      image: "/assets/certificates/generative-ai-literacy.pdf",
+      badge: "Certified",
+      skills: ["Generative AI", "AI Literacy", "IT-ITeS"],
+      isPdf: true,
+    },
+    {
+      id: 2,
       title: "Introduction to Large Language Models (LLMs)",
       issuer: "NPTEL - IIT Madras",
       date: "Jul-Oct 2025",
@@ -18,7 +28,7 @@ export default function Certificates() {
       skills: ["LLMs", "AI", "Machine Learning"],
     },
     {
-      id: 2,
+      id: 3,
       title: "Full-Stack JavaScript Development",
       issuer: "LinkedIn Learning",
       date: "Mar 2025",
@@ -27,7 +37,7 @@ export default function Certificates() {
       skills: ["MongoDB", "Node.js", "React"],
     },
     {
-      id: 3,
+      id: 4,
       title: "HTML Essential Training",
       issuer: "LinkedIn Learning",
       date: "Mar 2025",
@@ -67,11 +77,17 @@ export default function Certificates() {
             onClick={() => setSelectedCert(cert)}
           >
             <div className="relative overflow-hidden">
-              <img
-                src={cert.image}
-                alt={cert.title}
-                className="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-300"
-              />
+              {cert.isPdf ? (
+                <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                  <PiCertificateBold className="text-6xl text-gray-600" />
+                </div>
+              ) : (
+                <img
+                  src={cert.image}
+                  alt={cert.title}
+                  className="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                />
+              )}
               <div className="absolute top-3 right-3">
                 <span className="bg-black text-white text-xs px-3 py-1 rounded-full font-semibold">
                   {cert.badge}
@@ -128,11 +144,28 @@ export default function Certificates() {
               >
                 <IoClose size={24} />
               </button>
-              <img
-                src={selectedCert.image}
-                alt={selectedCert.title}
-                className="w-full h-auto"
-              />
+              {selectedCert.isPdf ? (
+                <div className="p-8 text-center">
+                  <PiCertificateBold className="text-8xl text-gray-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold mb-2">{selectedCert.title}</h3>
+                  <p className="text-gray-600 mb-4">{selectedCert.issuer}</p>
+                  <a
+                    href={selectedCert.image}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-full hover:bg-gray-800 transition-colors"
+                  >
+                    <HiOutlineExternalLink size={20} />
+                    View Certificate
+                  </a>
+                </div>
+              ) : (
+                <img
+                  src={selectedCert.image}
+                  alt={selectedCert.title}
+                  className="w-full h-auto"
+                />
+              )}
             </motion.div>
           </motion.div>
         )}
