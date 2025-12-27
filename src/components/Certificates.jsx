@@ -13,10 +13,9 @@ export default function Certificates() {
       title: "Generative AI Literacy",
       issuer: "IT-ITeS SSC Nasscom",
       date: "Dec 2025",
-      image: "/assets/certificates/generative-ai-literacy.pdf",
+      image: "/assets/certificates/generative-ai-literacy.png",
       badge: "Certified",
       skills: ["Generative AI", "AI Literacy", "IT-ITeS"],
-      isPdf: true,
     },
     {
       id: 2,
